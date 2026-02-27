@@ -1,0 +1,67 @@
+# Build directories
+build/
+cmake-build-*/
+*/build/
+**/build/
+
+# Libraries / binaries
+lib/
+bin/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+install_manifest.txt
+compile_commands.json
+
+# Thirdparty builds
+Thirdparty/DBoW2/build/
+Thirdparty/DBoW2/lib/
+Thirdparty/g2o/build/
+Thirdparty/g2o/lib/
+Thirdparty/g2o/config.h
+
+# Vocabulary (large file)
+Vocabulary/ORBvoc.txt
+
+# Logs / outputs
+KeyFrameTrajectory.txt
+CameraTrajectory.txt
+kf_*.txt
+f_*.txt
+ExecMean.txt
+SessionInfo.txt
+Results_*.txt
+LBA_Stats.txt
+LocalMapTimeStats.txt
+TrackLocalMapStats.txt
+TrackingTimeStats.txt
+time*
+Time*
+Table_*/
+
+# Python
+*.pyc
+__pycache__/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.user
+
+# Misc
+*.osa
+my_settings.txt
+borrar/
+# Editor swap files
+*.swp
+*.swo
+
+# SuperPoint vocabulary (store as compressed archive)
+Vocabulary/superpoint_voc.dbow3
+# Local vocabulary files (download separately)
+Vocabulary/*.yml
+Vocabulary/*.dbow3
+Vocabulary/*.tar.gz
