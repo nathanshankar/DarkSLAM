@@ -1,5 +1,13 @@
 ##List of Known Dependencies
-###ORB-SLAM3 v1.0
+### ORB-SLAM3 v1.0 / DarkSLAM
+
+The headless DarkSLAM build uses OpenCV, Eigen3, LibTorch/PyTorch (BSD-style),
+Boost serialization (Boost Software License), and OpenSSL (Apache 2.0 for 3.x).
+CLEAR-IR inference additionally uses TensorFlow (Apache 2.0), Keras (Apache 2.0),
+NumPy (BSD), h5py (BSD), and PyYAML (MIT). Pangolin and ROS are not required by
+this build. The following upstream attribution is retained for provenance;
+the original ORB extractor/matcher implementations and ROS examples are no
+longer included in the focused workspace.
 
 In this document we list all the pieces of code included  by ORB-SLAM3 and linked libraries which are not property of the authors of ORB-SLAM3.
 
@@ -21,10 +29,11 @@ The original code is BSD licensed.
 The code is from: http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel.
 The code is in the public domain.
 
-#####Code in Thirdparty folder
+##### Code in Thirdparty folder
 
-* All code in **DBoW2** folder.
-This is a modified version of [DBoW2](https://github.com/dorian3d/DBoW2) and [DLib](https://github.com/dorian3d/DLib) library. All files included are BSD licensed.
+* All code in **DBow3** folder.
+This is a modified version of [DBoW3](https://github.com/rmsalinas/DBow3), used
+for SuperPoint descriptor place recognition. Its license is retained in that folder.
 
 * All code in **g2o** folder.
 This is a modified version of [g2o](https://github.com/RainerKuemmerle/g2o). All files included are BSD licensed.

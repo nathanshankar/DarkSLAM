@@ -1,41 +1,8 @@
-echo "Configuring and building Thirdparty/DBoW3 ..."
-
-cd Thirdparty/DBow3
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j10
-
-cd ../../g2o
-
-echo "Configuring and building Thirdparty/g2o ..."
-
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make -j10
-
-cd ../../Sophus
-
-echo "Configuring and building Thirdparty/Sophus ..."
-
-mkdir build
-cd build
-# cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=OFF -DBUILD_EXAMPLES=OFF
-make -j10
-
-cd ../../../
-
-# echo "Uncompress vocabulary ..."
-
-# cd Vocabulary
-# tar -xf ORBvoc.txt.tar.gz
-# cd ..
-
-echo "Configuring and building ORB_SLAM3 ..."
-
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/usr -DOPENSSL_LIBRARIES=/usr/lib/x86_64-linux-gnu/libssl.so
-make -j10
+#!/usr/bin/env bash
+set -euo pipefail
+project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+python_bin="${PYTHON:-python3}"
+torch_prefix="$("$python_bin" -c 'import torch; print(torch.utils.cmake_prefix_path)')"
+cmake -S "$project_dir" -B "$project_dir/build" \
+    -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$torch_prefix" "$@"
+cmake --build "$project_dir/build" --parallel "${JOBS:-2}"

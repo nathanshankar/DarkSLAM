@@ -2,7 +2,6 @@
 #include "DescManip.h"
 #include "quicklz.h"
 #include <sstream>
-#include "timers.h"
 namespace DBoW3{
 // --------------------------------------------------------------------------
 

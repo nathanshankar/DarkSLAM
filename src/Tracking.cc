@@ -30,6 +30,7 @@
 #include "GeometricTools.h"
 
 #include <iostream>
+#include <cstdlib>
 
 #include <mutex>
 #include <chrono>
@@ -49,6 +50,8 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
     mnInitialFrameId(0), mbCreatedMap(false), mnFirstFrameId(0), mpCamera2(nullptr), mpLastKeyFrame(static_cast<KeyFrame*>(NULL))
 {
     // Load camera parameters from settings file
+    const char* modelPath = std::getenv("DARKSLAM_SUPERPOINT_MODEL");
+    spModelPath = modelPath ? modelPath : "Vocabulary/SuperPointNet.pt";
     if(settings){
         newParameterLoader(settings);
     }
@@ -97,7 +100,6 @@ Tracking::Tracking(System *pSys, ORBVocabulary* pVoc, FrameDrawer *pFrameDrawer,
     initID = 0; lastID = 0;
     mbInitWith3KFs = false;
     mnNumDataset = 0;
-    spModelPath = "/home/c12888mg/Code/DarkSLAM/SUPERSLAM3/Weights/SuperPointNet.pt";
 
     vector<GeometricCamera*> vpCams = mpAtlas->GetAllCameras();
     std::cout << "There are " << vpCams.size() << " cameras in the atlas" << std::endl;
@@ -2211,7 +2213,7 @@ void Tracking::Track()
         // Update drawer
         mpFrameDrawer->Update(this);
         if(mCurrentFrame.isSet())
-            mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.GetPose());
+            if(mpMapDrawer) mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.GetPose());
 
         if(bOK || mState==RECENTLY_LOST)
         {
@@ -2227,7 +2229,7 @@ void Tracking::Track()
             }
 
             if(mSensor == System::IMU_MONOCULAR || mSensor == System::IMU_STEREO || mSensor == System::IMU_RGBD)
-                mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.GetPose());
+                if(mpMapDrawer) mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.GetPose());
 
             // Clean VO matches
             for(int i=0; i<mCurrentFrame.N; i++)
@@ -2449,7 +2451,7 @@ void Tracking::StereoInitialization()
 
         mpAtlas->GetCurrentMap()->mvpKeyFrameOrigins.push_back(pKFini);
 
-        mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.GetPose());
+        if(mpMapDrawer) mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.GetPose());
 
         mState=OK;
     }
@@ -2672,7 +2674,7 @@ void Tracking::CreateInitialMapMonocular()
 
     mpAtlas->SetReferenceMapPoints(mvpLocalMapPoints);
 
-    mpMapDrawer->SetCurrentCameraPose(pKFcur->GetPose());
+    if(mpMapDrawer) mpMapDrawer->SetCurrentCameraPose(pKFcur->GetPose());
 
     mpAtlas->GetCurrentMap()->mvpKeyFrameOrigins.push_back(pKFini);
 

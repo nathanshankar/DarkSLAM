@@ -22,6 +22,8 @@ Thirdparty/DBoW2/lib/
 Thirdparty/g2o/build/
 Thirdparty/g2o/lib/
 Thirdparty/g2o/config.h
+Thirdparty/DBow3/config.h
+Thirdparty/DBow3/DBoW3Config.cmake
 
 # Vocabulary (large file)
 Vocabulary/ORBvoc.txt
@@ -59,9 +61,15 @@ borrar/
 *.swp
 *.swo
 
-# SuperPoint vocabulary (store as compressed archive)
-Vocabulary/superpoint_voc.dbow3
-# Local vocabulary files (download separately)
+# The SuperPoint vocabulary is versioned through Git LFS (.gitattributes).
 Vocabulary/*.yml
-Vocabulary/*.dbow3
 Vocabulary/*.tar.gz
+
+# Dataset checkouts and isolated evaluation outputs
+/data/
+/results/
+/.venv/
+*.h5.tmp
+
+# Legacy in-source executables
+/Examples/RGB-D/rgbd_tum_headless

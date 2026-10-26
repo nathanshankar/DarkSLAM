@@ -1,0 +1,7 @@
+tensorflow>=2.18,<2.19
+keras>=3.10,<4
+numpy>=1.26,<2.1
+opencv-python-headless>=4.8,<5
+h5py>=3.11,<4
+PyYAML>=6,<7
+matplotlib>=3.7,<4

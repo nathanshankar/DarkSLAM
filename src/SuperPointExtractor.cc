@@ -1,5 +1,6 @@
 #include "SuperPointExtractor.h"
 #include <iostream>
+#include <cstdlib>
 
 namespace ORB_SLAM3 {
 
@@ -15,15 +16,17 @@ SuperPointExtractor::SuperPointExtractor(const std::string& model_path,
       mDevice(torch::kCPU)
 {
     // Decide device first
-    mDevice = torch::cuda::is_available() ? torch::Device(torch::kCUDA)
-                                          : torch::Device(torch::kCPU);
+    const char* visible = std::getenv("CUDA_VISIBLE_DEVICES");
+    const bool cpuOnly = visible && (std::string(visible).empty() || std::string(visible) == "-1");
+    mDevice = !cpuOnly && torch::cuda::is_available() ? torch::Device(torch::kCUDA)
+                                                    : torch::Device(torch::kCPU);
 
     try {
         // Load the TorchScript model directly onto that device
         std::cout << "Loading SuperPoint model from: " << model_path
                   << " on device: " << (mDevice.is_cuda() ? "CUDA" : "CPU") << std::endl;
 
-        mModel = torch::jit::load("/home/c12888mg/Code/DarkSLAM/SUPERSLAM3/Weights/SuperPointNet.pt", mDevice);
+        mModel = torch::jit::load(model_path, mDevice);
         mModel.to(mDevice);
         mModel.eval();
     }
@@ -61,6 +64,7 @@ int SuperPointExtractor::operator()(cv::InputArray _image, cv::InputArray _mask,
                                   cv::OutputArray _descriptors,
                                   std::vector<int>& vLappingArea)
 {
+    torch::NoGradGuard no_grad;
     cv::Mat image = _image.getMat();
     cv::Mat vis_img = image.clone();
     if(image.empty())

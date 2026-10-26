@@ -20,23 +20,22 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-
 #include <unistd.h>
 #include<stdio.h>
 #include<stdlib.h>
 #include<string>
 #include<thread>
 #include<opencv2/core/core.hpp>
+// // // #include <pangolin/pangolin.h>
 
 #include "Tracking.h"
 #include "FrameDrawer.h"
 #include "MapDrawer.h"
 #include "Atlas.h"
 #include "LocalMapping.h"
-#include "LoopClosing.h"
 #include "KeyFrameDatabase.h"
 #include "SPVocabulary.h"
-#include "Viewer.h"
+// #include "Viewer.h"
 #include "ImuTypes.h"
 #include "Settings.h"
 
@@ -71,9 +70,9 @@ public:
     }
 };
 
-class Viewer;
+// class Viewer;
 class FrameDrawer;
-class MapDrawer;
+// class MapDrawer;
 class Atlas;
 class Tracking;
 class LocalMapping;
@@ -189,6 +188,9 @@ public:
 
     float GetImageScale();
 
+    FrameDrawer* mpFrameDrawer;
+    // MapDrawer* mpMapDrawer;
+
 #ifdef REGISTER_TIMES
     void InsertRectTime(double& time);
     void InsertResizeTime(double& time);
@@ -228,16 +230,17 @@ private:
     LoopClosing* mpLoopCloser;
 
     // The viewer draws the map and the current camera pose. It uses Pangolin.
-    Viewer* mpViewer;
+    // Viewer* mpViewer;
 
-    FrameDrawer* mpFrameDrawer;
-    MapDrawer* mpMapDrawer;
+    // The viewer draws the map and the current camera pose. It uses Pangolin.
+    // Viewer* mpViewer;
+
 
     // System threads: Local Mapping, Loop Closing, Viewer.
     // The Tracking thread "lives" in the main execution thread that creates the System object.
     std::thread* mptLocalMapping;
     std::thread* mptLoopClosing;
-    std::thread* mptViewer;
+    // std::thread* mptViewer;
 
     // Reset flag
     std::mutex mMutexReset;

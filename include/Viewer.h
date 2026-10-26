@@ -41,25 +41,15 @@ class Viewer
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    Viewer(System* pSystem, FrameDrawer* pFrameDrawer, MapDrawer* pMapDrawer, Tracking *pTracking, const string &strSettingPath, Settings* settings);
-
-    void newParameterLoader(Settings* settings);
-
-    // Main thread function. Draw points, keyframes, the current camera pose and the last processed
-    // frame. Drawing is refreshed according to the camera fps. We use Pangolin.
-    void Run();
-
-    void RequestFinish();
-
-    void RequestStop();
-
-    bool isFinished();
-
-    bool isStopped();
-
-    bool isStepByStep();
-
-    void Release();
+    Viewer(System* pSystem, FrameDrawer* pFrameDrawer, MapDrawer* pMapDrawer, Tracking *pTracking, const string &strSettingPath, Settings* settings) {}
+    void newParameterLoader(Settings* settings) {}
+    void Run() {}
+    void RequestFinish() {}
+    void RequestStop() {}
+    bool isFinished() { return true; }
+    bool isStopped() { return true; }
+    bool isStepByStep() { return false; }
+    void Release() {}
 
     //void SetTrackingPause();
 

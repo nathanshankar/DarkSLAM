@@ -21,7 +21,7 @@
 #include "System.h"
 #include "Converter.h"
 #include <thread>
-#include <pangolin/pangolin.h>
+// // // #include <pangolin/pangolin.h>
 #include <iomanip>
 #include <openssl/md5.h>
 #include <boost/serialization/base_object.hpp>
@@ -40,7 +40,7 @@ Verbose::eLevel Verbose::th = Verbose::VERBOSITY_NORMAL;
 
 System::System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor,
                const bool bUseViewer, const int initFr, const string &strSequence):
-    mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), mbReset(false), mbResetActiveMap(false),
+    mSensor(sensor), mbReset(false), mbResetActiveMap(false),
     mbActivateLocalizationMode(false), mbDeactivateLocalizationMode(false), mbShutDown(false)
 {
     // Output welcome message
@@ -183,12 +183,11 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
     //Create Drawers. These are used by the Viewer
     mpFrameDrawer = new FrameDrawer(mpAtlas);
-    mpMapDrawer = new MapDrawer(mpAtlas, strSettingsFile, settings_);
+    // mpMapDrawer = new MapDrawer(mpAtlas, strSettingsFile, settings_);
 
-    //Initialize the Tracking thread
     //(it will live in the main thread of execution, the one that called this constructor)
     cout << "Seq. Name: " << strSequence << endl;
-    mpTracker = new Tracking(this, mpVocabulary, mpFrameDrawer, mpMapDrawer,
+    mpTracker = new Tracking(this, mpVocabulary, mpFrameDrawer, nullptr /*mpMapDrawer*/,
                              mpAtlas, mpKeyFrameDatabase, strSettingsFile, mSensor, settings_, strSequence);
 
     //Initialize the Local Mapping thread and launch
@@ -229,11 +228,13 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     if(bUseViewer)
     //if(false) // TODO
     {
+        /*
         mpViewer = new Viewer(this, mpFrameDrawer,mpMapDrawer,mpTracker,strSettingsFile,settings_);
         mptViewer = new thread(&Viewer::Run, mpViewer);
         mpTracker->SetViewer(mpViewer);
         mpLoopCloser->mpViewer = mpViewer;
         mpViewer->both = mpFrameDrawer->both;
+        */
     }
 
     // Fix verbosity
@@ -243,7 +244,8 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
 Sophus::SE3f System::GetViewerPose()
 {
-    return mpMapDrawer->GetCurrentCameraPose();
+    // return mpMapDrawer->GetCurrentCameraPose();
+    return Sophus::SE3f();
 }
 
 std::vector<Sophus::SE3f> System::GetAllKeyFramePosesTwc() const
@@ -555,6 +557,11 @@ void System::Shutdown()
 
     mpLocalMapper->RequestFinish();
     mpLoopCloser->RequestFinish();
+    // Do not export a trajectory while mapping or bundle adjustment mutates it.
+    while(!mpLocalMapper->isFinished() || !mpLoopCloser->isFinished() || mpLoopCloser->isRunningGBA())
+        usleep(5000);
+    if(mptLocalMapping && mptLocalMapping->joinable()) mptLocalMapping->join();
+    if(mptLoopClosing && mptLoopClosing->joinable()) mptLoopClosing->join();
     /*if(mpViewer)
     {
         mpViewer->RequestFinish();
@@ -607,7 +614,18 @@ void System::SaveTrajectoryTUM(const string &filename)
         return;
     }
 
-    vector<KeyFrame*> vpKFs = mpAtlas->GetAllKeyFrames();
+    // Export one connected map. Separate atlas maps have unrelated origins.
+    Map* exportMap = nullptr;
+    for(Map* map : mpAtlas->GetAllMaps())
+        if(!exportMap || map->KeyFramesInMap() > exportMap->KeyFramesInMap())
+            exportMap = map;
+    vector<KeyFrame*> vpKFs = exportMap ? exportMap->GetAllKeyFrames() : vector<KeyFrame*>();
+    if(vpKFs.empty())
+    {
+        ofstream empty(filename.c_str());
+        cerr << "No initialized map; trajectory is empty." << endl;
+        return;
+    }
     sort(vpKFs.begin(),vpKFs.end(),KeyFrame::lId);
 
     // Transform all keyframes so that the first keyframe is at the origin.
@@ -643,6 +661,9 @@ void System::SaveTrajectoryTUM(const string &filename)
             Trw = Trw * pKF->mTcp;
             pKF = pKF->GetParent();
         }
+
+        if(pKF->GetMap() != exportMap)
+            continue;
 
         Trw = Trw * pKF->GetPose() * Two;
 
