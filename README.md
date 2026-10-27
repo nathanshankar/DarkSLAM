@@ -56,9 +56,6 @@ Required inference assets:
 The CLEAR-IR checkpoint and SuperPoint extractor are included in ordinary Git.
 Download the 112 MiB vocabulary with `python3 tools/download_vocabulary.py`.
 It retrieves the exact vocabulary from the [inference-assets release](https://github.com/nathanshankar/DarkSLAM/releases/tag/inference-assets),
-checks its SHA-256, and skips downloading when a verified local copy already exists.
-The vocabulary is kept outside Git to avoid Git LFS quota requirements for this
-repository. Git LFS is still needed for the separate dataset repository below.
 The CLI checks that all required assets exist before processing. Inference loads
 the H5 directly with `compile=False`.
 
@@ -130,7 +127,7 @@ python -m darkslam.evaluate \
     --output results/dark_sq1_clearir
 ```
 
-This single command associates IR/depth frames, enhances the selected IR frames,
+This command associates IR/depth frames, enhances the selected IR frames,
 runs SLAM, and evaluates the camera trajectory against `vicon.csv`. TensorFlow
 inference completes in a separate process before the LibTorch SLAM process starts.
 Results go into the chosen output directory, which must be empty to avoid mixing runs.
