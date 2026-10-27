@@ -27,7 +27,7 @@ sudo apt-get install build-essential cmake git-lfs python3-venv libopencv-dev \
 git lfs install
 git clone https://github.com/nathanshankar/DarkSLAM.git
 cd DarkSLAM
-git lfs pull
+python3 tools/download_vocabulary.py
 
 python3 -m venv .venv
 source .venv/bin/activate
@@ -51,14 +51,16 @@ Required inference assets:
 | --- | --- |
 | `models/clearir.h5` | Supplied CLEAR-IR checkpoint, including its serialized architecture |
 | `Vocabulary/SuperPointNet.pt` | SuperPoint TorchScript feature extractor |
-| `Vocabulary/superpoint_voc.dbow3` | SuperPoint vocabulary for place recognition; stored with Git LFS |
+| `Vocabulary/superpoint_voc.dbow3` | SuperPoint vocabulary for place recognition; downloaded from the inference-assets release |
 
-All three assets are present in this prepared workspace. When publishing these
-changes, run `git lfs install` before adding the vocabulary so its large binary
-is uploaded through LFS. The checkpoint and SuperPoint extractor fit in ordinary
-Git files. The CLI checks that all required assets exist before processing.
-See [model notes](models/README.md) for the checkpoint's relationship to the supplied
-research `clearir.py`. Inference loads the H5 directly with `compile=False`.
+The CLEAR-IR checkpoint and SuperPoint extractor are included in ordinary Git.
+Download the 112 MiB vocabulary with `python3 tools/download_vocabulary.py`.
+It retrieves the exact vocabulary from the [inference-assets release](https://github.com/nathanshankar/DarkSLAM/releases/tag/inference-assets),
+checks its SHA-256, and skips downloading when a verified local copy already exists.
+The vocabulary is kept outside Git to avoid Git LFS quota requirements for this
+repository. Git LFS is still needed for the separate dataset repository below.
+The CLI checks that all required assets exist before processing. Inference loads
+the H5 directly with `compile=False`.
 
 ## Get the CLEARIR datasets
 

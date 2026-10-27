@@ -61,7 +61,8 @@ borrar/
 *.swp
 *.swo
 
-# The SuperPoint vocabulary is versioned through Git LFS (.gitattributes).
+# The vocabulary is downloaded from a GitHub Release, outside Git.
+Vocabulary/superpoint_voc.dbow3
 Vocabulary/*.yml
 Vocabulary/*.tar.gz
 
